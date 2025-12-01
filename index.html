@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Signals Pro - AI Trading Platform</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --light: #f9fafb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideDown 0.6s ease;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo-section h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .logo-section p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .live-stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .market-selector {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .market-tabs {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .market-tab {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .market-tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(99, 102, 241, 0.6);
+        }
+
+        .market-tab.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .signal-badge {
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge-buy {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .badge-sell {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .badge-hold {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .signal-details {
+            margin: 15px 0;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .detail-value {
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .price-up {
+            color: var(--success);
+        }
+
+        .price-down {
+            color: var(--danger);
+        }
+
+        .confidence-meter {
+            margin-top: 20px;
+        }
+
+        .confidence-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .confidence-bar {
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--warning), var(--danger));
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+
+        .action-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-execute {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-execute:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(99, 102, 241, 0.6);
+        }
+
+        .btn-alert {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-alert:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .analysis-section {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .analysis-title {
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .analysis-text {
+            color: #555;
+            line-height: 1.6;
+            font-size: 0.9em;
+        }
+
+        .market-overview {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .overview-title {
+            font-size: 2em;
+            color: var(--dark);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .metric-box {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .metric-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.6);
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .floating-refresh {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            color: white;
+            font-size: 1.5em;
+        }
+
+        .floating-refresh:hover {
+            transform: rotate(180deg) scale(1.1);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.8);
+        }
+
+        .timestamp {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .dashboard-card {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .logo-section h1 {
+                font-size: 1.8em;
+            }
+
+            .live-stats {
+                justify-content: center;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .action-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <h1>🚀 Trading Signals Pro</h1>
+                    <p>AI-Powered Market Intelligence Platform</p>
+                </div>
+                <div class="live-stats">
+                    <div class="stat-item">
+                        <div class="stat-value pulse">LIVE</div>
+                        <div class="stat-label">Status</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">18</div>
+                        <div class="stat-label">Active Signals</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">82%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="market-selector">
+            <div class="market-tabs">
+                <button class="market-tab active" onclick="filterMarket('all')">📊 All Markets</button>
+                <button class="market-tab" onclick="filterMarket('crypto')">🪙 Crypto</button>
+                <button class="market-tab" onclick="filterMarket('indian')">🇮🇳 Indian Stocks</button>
+                <button class="market-tab" onclick="filterMarket('us')">🇺🇸 US Stocks</button>
+                <button class="market-tab" onclick="filterMarket('forex')">💱 Forex</button>
+            </div>
+        </div>
+
+        <div class="market-overview">
+            <h2 class="overview-title">📈 Market Performance Dashboard</h2>
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <div class="metric-value">+18.5%</div>
+                    <div class="metric-label">Avg Profit</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value">$45.2K</div>
+                    <div class="metric-label">Total Volume</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value">156</div>
+                    <div class="metric-label">Trades Today</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value">Bullish 🔥</div>
+                    <div class="metric-label">Market Mood</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard" id="signalsContainer">
+            <!-- Crypto Signals -->
+            <div class="dashboard-card" data-market="crypto">
+                <div class="card-header">
+                    <div class="card-title">BTC/USDT</div>
+                    <span class="signal-badge badge-buy">STRONG BUY</span>
+                </div>
+                <div class="signal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">💰 Entry</span>
+                        <span class="detail-value">$42,350</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 1</span>
+                        <span class="detail-value price-up">$45,200 (+6.7%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 2</span>
+                        <span class="detail-value price-up">$48,900 (+15.5%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🛑 Stop Loss</span>
+                        <span class="detail-value price-down">$40,100 (-5.3%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">⚖️ R/R</span>
+                        <span class="detail-value">1:2.9</span>
+                    </div>
+                </div>
+                <div class="confidence-meter">
+                    <div class="confidence-label">
+                        <span>Confidence</span>
+                        <span><strong>92%</strong></span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 92%"></div>
+                    </div>
+                </div>
+                <div class="analysis-section">
+                    <div class="analysis-title">📊 Analysis</div>
+                    <div class="analysis-text">
+                        Strong bullish momentum. RSI 58, MACD crossover. Breaking $42K resistance with volume. Institutional buying detected.
+                    </div>
+                </div>
+                <div class="action-section">
+                    <button class="action-btn btn-execute" onclick="executeTrade('BTC')">Execute</button>
+                    <button class="action-btn btn-alert" onclick="setAlert('BTC')">Alert</button>
+                </div>
+            </div>
+
+            <div class="dashboard-card" data-market="crypto">
+                <div class="card-header">
+                    <div class="card-title">ETH/USDT</div>
+                    <span class="signal-badge badge-buy">BUY</span>
+                </div>
+                <div class="signal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">💰 Entry</span>
+                        <span class="detail-value">$2,285</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 1</span>
+                        <span class="detail-value price-up">$2,450 (+7.2%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 2</span>
+                        <span class="detail-value price-up">$2,680 (+17.3%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🛑 Stop Loss</span>
+                        <span class="detail-value price-down">$2,180 (-4.6%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">⚖️ R/R</span>
+                        <span class="detail-value">1:3.8</span>
+                    </div>
+                </div>
+                <div class="confidence-meter">
+                    <div class="confidence-label">
+                        <span>Confidence</span>
+                        <span><strong>88%</strong></span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 88%"></div>
+                    </div>
+                </div>
+                <div class="analysis-section">
+                    <div class="analysis-title">📊 Analysis</div>
+                    <div class="analysis-text">
+                        Ascending triangle pattern. Support at $2,250. Volume increasing. Shanghai upgrade momentum continuing.
+                    </div>
+                </div>
+                <div class="action-section">
+                    <button class="action-btn btn-execute" onclick="executeTrade('ETH')">Execute</button>
+                    <button class="action-btn btn-alert" onclick="setAlert('ETH')">Alert</button>
+                </div>
+            </div>
+
+            <div class="dashboard-card" data-market="crypto">
+                <div class="card-header">
+                    <div class="card-title">SOL/USDT</div>
+                    <span class="signal-badge badge-buy">STRONG BUY</span>
+                </div>
+                <div class="signal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">💰 Entry</span>
+                        <span class="detail-value">$98.50</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 1</span>
+                        <span class="detail-value price-up">$108 (+9.6%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 2</span>
+                        <span class="detail-value price-up">$125 (+26.9%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🛑 Stop Loss</span>
+                        <span class="detail-value price-down">$92 (-6.6%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">⚖️ R/R</span>
+                        <span class="detail-value">1:4.1</span>
+                    </div>
+                </div>
+                <div class="confidence-meter">
+                    <div class="confidence-label">
+                        <span>Confidence</span>
+                        <span><strong>95%</strong></span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 95%"></div>
+                    </div>
+                </div>
+                <div class="analysis-section">
+                    <div class="analysis-title">📊 Analysis</div>
+                    <div class="analysis-text">
+                        Breaking consolidation. Network activity surging. DeFi TVL growing. Golden cross forming on daily.
+                    </div>
+                </div>
+                <div class="action-section">
+                    <button class="action-btn btn-execute" onclick="executeTrade('SOL')">Execute</button>
+                    <button class="action-btn btn-alert" onclick="setAlert('SOL')">Alert</button>
+                </div>
+            </div>
+
+            <!-- Indian Stocks -->
+            <div class="dashboard-card" data-market="indian">
+                <div class="card-header">
+                    <div class="card-title">RELIANCE</div>
+                    <span class="signal-badge badge-buy">BUY</span>
+                </div>
+                <div class="signal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">💰 Entry</span>
+                        <span class="detail-value">₹2,485</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 1</span>
+                        <span class="detail-value price-up">₹2,620 (+5.4%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 2</span>
+                        <span class="detail-value price-up">₹2,780 (+11.9%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🛑 Stop Loss</span>
+                        <span class="detail-value price-down">₹2,395 (-3.6%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">⚖️ R/R</span>
+                        <span class="detail-value">1:3.3</span>
+                    </div>
+                </div>
+                <div class="confidence-meter">
+                    <div class="confidence-label">
+                        <span>Confidence</span>
+                        <span><strong>85%</strong></span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 85%"></div>
+                    </div>
+                </div>
+                <div class="analysis-section">
+                    <div class="analysis-title">📊 Analysis</div>
+                    <div class="analysis-text">
+                        Bouncing from support. Oil prices stable. FII buying resumed. Bullish flag pattern. Q4 results positive.
+                    </div>
+                </div>
+                <div class="action-section">
+                    <button class="action-btn btn-execute" onclick="executeTrade('RELIANCE')">Execute</button>
+                    <button class="action-btn btn-alert" onclick="setAlert('RELIANCE')">Alert</button>
+                </div>
+            </div>
+
+            <div class="dashboard-card" data-market="indian">
+                <div class="card-header">
+                    <div class="card-title">INFY</div>
+                    <span class="signal-badge badge-buy">BUY</span>
+                </div>
+                <div class="signal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">💰 Entry</span>
+                        <span class="detail-value">₹1,445</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 1</span>
+                        <span class="detail-value price-up">₹1,520 (+5.2%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 2</span>
+                        <span class="detail-value price-up">₹1,625 (+12.5%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🛑 Stop Loss</span>
+                        <span class="detail-value price-down">₹1,390 (-3.8%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">⚖️ R/R</span>
+                        <span class="detail-value">1:3.3</span>
+                    </div>
+                </div>
+                <div class="confidence-meter">
+                    <div class="confidence-label">
+                        <span>Confidence</span>
+                        <span><strong>82%</strong></span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 82%"></div>
+                    </div>
+                </div>
+                <div class="analysis-section">
+                    <div class="analysis-title">📊 Analysis</div>
+                    <div class="analysis-text">
+                        Strong fundamentals. Large deal wins. IT sector rotation. Breakout from consolidation. AI revenue growing.
+                    </div>
+                </div>
+                <div class="action-section">
+                    <button class="action-btn btn-execute" onclick="executeTrade('INFY')">Execute</button>
+                    <button class="action-btn btn-alert" onclick="setAlert('INFY')">Alert</button>
+                </div>
+            </div>
+
+            <!-- US Stocks -->
+            <div class="dashboard-card" data-market="us">
+                <div class="card-header">
+                    <div class="card-title">AAPL</div>
+                    <span class="signal-badge badge-buy">STRONG BUY</span>
+                </div>
+                <div class="signal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">💰 Entry</span>
+                        <span class="detail-value">$186.25</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 1</span>
+                        <span class="detail-value price-up">$198 (+6.3%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 2</span>
+                        <span class="detail-value price-up">$212 (+13.8%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🛑 Stop Loss</span>
+                        <span class="detail-value price-down">$178.50 (-4.2%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">⚖️ R/R</span>
+                        <span class="detail-value">1:3.3</span>
+                    </div>
+                </div>
+                <div class="confidence-meter">
+                    <div class="confidence-label">
+                        <span>Confidence</span>
+                        <span><strong>93%</strong></span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 93%"></div>
+                    </div>
+                </div>
+                <div class="analysis-section">
+                    <div class="analysis-title">📊 Analysis</div>
+                    <div class="analysis-text">
+                        Breaking ATH. iPhone 15 sales strong. Services growing. Vision Pro momentum. AI features driving upgrades.
+                    </div>
+                </div>
+                <div class="action-section">
+                    <button class="action-btn btn-execute" onclick="executeTrade('AAPL')">Execute</button>
+                    <button class="action-btn btn-alert" onclick="setAlert('AAPL')">Alert</button>
+                </div>
+            </div>
+
+            <div class="dashboard-card" data-market="us">
+                <div class="card-header">
+                    <div class="card-title">NVDA</div>
+                    <span class="signal-badge badge-buy">STRONG BUY</span>
+                </div>
+                <div class="signal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">💰 Entry</span>
+                        <span class="detail-value">$485.50</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 1</span>
+                        <span class="detail-value price-up">$525 (+8.1%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 2</span>
+                        <span class="detail-value price-up">$580 (+19.5%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🛑 Stop Loss</span>
+                        <span class="detail-value price-down">$460 (-5.3%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">⚖️ R/R</span>
+                        <span class="detail-value">1:3.7</span>
+                    </div>
+                </div>
+                <div class="confidence-meter">
+                    <div class="confidence-label">
+                        <span>Confidence</span>
+                        <span><strong>96%</strong></span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 96%"></div>
+                    </div>
+                </div>
+                <div class="analysis-section">
+                    <div class="analysis-title">📊 Analysis</div>
+                    <div class="analysis-text">
+                        Dominating AI chips. Data center revenue exploding. New GPU launches. Cloud partnerships. Massive volume.
+                    </div>
+                </div>
+                <div class="action-section">
+                    <button class="action-btn btn-execute" onclick="executeTrade('NVDA')">Execute</button>
+                    <button class="action-btn btn-alert" onclick="setAlert('NVDA')">Alert</button>
+                </div>
+            </div>
+
+            <!-- Forex -->
+            <div class="dashboard-card" data-market="forex">
+                <div class="card-header">
+                    <div class="card-title">EUR/USD</div>
+                    <span class="signal-badge badge-sell">SELL</span>
+                </div>
+                <div class="signal-details">
+                    <div class="detail-row">
+                        <span class="detail-label">💰 Entry</span>
+                        <span class="detail-value">1.0875</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 1</span>
+                        <span class="detail-value price-up">1.0795 (+0.74%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🎯 Target 2</span>
+                        <span class="detail-value price-up">1.0685 (+1.75%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🛑 Stop Loss</span>
+                        <span class="detail-value price-down">1.0925 (-0.46%)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">⚖️ R/R</span>
+                        <span class="detail-value">1:3.8</span>
+                    </div>
+                </div>
+                <div class="confidence-meter">
+                    <div class="confidence-label">
+                        <span>Confidence</span>
+                        <span><strong>81%</strong></span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 81%"></div>
+                    </div>
+                </div>
+                <div class="analysis-section">
+                    <div class="analysis-title">📊 Analysis</div>
+                    <div class="analysis-text">
+                        Bearish momentum. Fed hawkish. ECB dovish. Breakdown below 1.0900. Dollar index rising.
+                    </div>
+                </div>
+                <div class="action-section">
+                    <button class="action-btn btn-execute" onclick="executeTrade('EUR/USD')">Execute</button>
+                    <button class="action-btn btn-alert" onclick="setAlert('EUR/USD')">Alert</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="timestamp">
+            🕐 Last Updated: <span id="currentTime"></span>
+        </div>
+    </div>
+
+    <div class="floating-refresh" onclick="refreshData()">
+        🔄
+    </div>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleString();
+        }
+
+        function filterMarket(market) {
+            const tabs = document.querySelectorAll('.market-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const cards = document.querySelectorAll('.dashboard-card');
+            cards.forEach(card => {
+                card.style.display = market === 'all' || card.dataset.market === market ? 'block' : 'none';
+            });
+        }
+
+        function executeTrade(symbol) {
+            alert(`🚀 Executing trade for ${symbol}\n\nIn live version:\n✅ Connect to trading account\n✅ Place order automatically\n✅ Set stop loss/targets\n✅ Send confirmation`);
+        }
+
+        function setAlert(symbol) {
+            alert(`🔔 Alert set for ${symbol}\n\nYou'll be notified when:\n✅ Entry zone reached\n✅ Targets hit\n✅ Stop loss triggered`);
+        }
+
+        function refreshData() {
+            alert('✅ Refreshing data!\n\nIn live version:\n📊 Fetch latest prices\n🔄 Update signals\n📈 Recalculate levels');
+            updateTime();
+        }
+
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>
